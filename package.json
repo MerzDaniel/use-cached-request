@@ -1,0 +1,28 @@
+{
+  "name": "use-cached-request",
+  "version": "0.1.0",
+  "description": "A react hook for fetching data. The fetched data is cached.",
+  "main": "index.jsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/merzdaniel/use-cached-request.git"
+  },
+  "keywords": [
+    "react",
+    "hook",
+    "data",
+    "fetch",
+    "rest",
+    "cache",
+    "caching"
+  ],
+  "author": "Daniel Merz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/merzdaniel/use-cached-request/issues"
+  },
+  "homepage": "https://github.com/merzdaniel/use-cached-request#readme"
+}
