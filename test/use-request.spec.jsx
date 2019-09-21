@@ -5,18 +5,27 @@ import {create, act} from 'react-test-renderer'
 
 import './utils/ignore-comp-update-outside-act-warning'
 import {useRequest} from '../src/use-request'
+import {RequestProvider, useCachedRequest} from "../src/use-cached-request";
 
-function TestComp() {
-  const hook = useRequest('/some/cool/api/123')
-  const {data, isPending, error} = hook
+function TestCompWithHook({hook}) {
+  const request = hook('/some/cool/api/123')
+  const {data, isPending, error} = request
   const res = `${isPending || data || error}`
-  return <div hook={hook}>
+  return <div data-request={request}>
     {res}
   </div>
 }
+function TestComp() {
+  return <TestCompWithHook hook={useRequest} />
+}
+function TestCompCached() {
+  return <RequestProvider>
+    <TestCompWithHook hook={useCachedRequest} />
+  </RequestProvider>
+}
 
-function getHook(comp) {
-  return comp.root.findByType('div').props.hook
+function getRequest(comp) {
+  return comp.root.findByType('div').props['data-request']
 }
 
 const waitForIO = async () => {
@@ -25,48 +34,51 @@ const waitForIO = async () => {
   })
 }
 
-describe('tests', () => {
-  let sandbox
-  beforeEach(() => {
-    sandbox = sinon.createSandbox()
-  })
-  afterEach(() => {
-    sandbox.restore()
-  })
-
-  it('should show pending state', () => {
-    sandbox.stub(axios, 'get').resolves({data: 'foo'})
-    let comp
-    act(() => {
-      comp = create(<TestComp/>)
+for (let h of ['useRequest','useCachedRequest']) {
+  describe(`Test for ${h}`, () => {
+    let sandbox
+    let _TestCompUT = h === 'useRequest' ? TestComp : TestCompCached
+    beforeEach(() => {
+      sandbox = sinon.createSandbox()
     })
-    expect(comp.toJSON()).toMatchSnapshot()
-  })
-  it('should show fetched data', async () => {
-    let stub = sandbox.stub(axios, 'get').resolves({data: 'bar'})
-    let comp
-    act(() => {
-      comp = create(<TestComp/>)
+    afterEach(() => {
+      sandbox.restore()
     })
-    await waitForIO()
-    expect(comp.toJSON()).toMatchSnapshot()
-    expect(stub.callCount).toBe(1)
-  })
-  it('should show re-fetch data', async () => {
-    let stub = sandbox.stub(axios, 'get')
-      .onFirstCall().resolves({data: 'baz'})
-      .onSecondCall().resolves({data: 'foo-bar'})
 
-    let comp
-    act(() => {
-      comp = create(<TestComp/>)
+    it('should show pending state', () => {
+      sandbox.stub(axios, 'get').resolves({data: 'foo'})
+      let comp
+      act(() => {
+        comp = create(<_TestCompUT/>)
+      })
+      expect(comp.toJSON()).toMatchSnapshot()
     })
-    await waitForIO()
-    expect(comp.root.findByType('div').props.hook.data).toBe('baz')
+    it('should show fetched data', async () => {
+      let stub = sandbox.stub(axios, 'get').resolves({data: 'bar'})
+      let comp
+      act(() => {
+        comp = create(<_TestCompUT/>)
+      })
+      await waitForIO()
+      expect(comp.toJSON()).toMatchSnapshot()
+      expect(stub.callCount).toBe(1)
+    })
+    it('should show re-fetch data', async () => {
+      let stub = sandbox.stub(axios, 'get')
+        .onFirstCall().resolves({data: 'baz'})
+        .onSecondCall().resolves({data: 'foo-bar'})
 
-    getHook(comp).refetch()
-    await waitForIO()
-    expect(getHook(comp).data).toBe('foo-bar')
-    expect(stub.callCount).toBe(2)
+      let comp
+      act(() => {
+        comp = create(<_TestCompUT/>)
+      })
+      await waitForIO()
+      expect(getRequest(comp).data).toBe('baz')
+
+      getRequest(comp).refetch()
+      await waitForIO()
+      expect(getRequest(comp).data).toBe('foo-bar')
+      expect(stub.callCount).toBe(2)
+    })
   })
-})
+}
