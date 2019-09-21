@@ -10,24 +10,11 @@ const useRequest = (url) => {
     data: {},
   })
 
-  useRequestFetcher(url, requests, setRequestStates, httpClient)
+  const {
+    refetch, isPending, data, error
+  } = useRequestFetcher(url, requests, setRequestStates, httpClient)
 
-  function refetch() {
-    setRequestStates({
-      data: requests.data,
-      states: {
-        ...requests.states,
-        [url]: {...requests.states[url], refetch: true},
-      },
-    })
-  }
-
-  return {
-    error: requests.states[url] ? requests.states[url].error : null,
-    isPending: requests.states[url] ? requests.states[url].pending : true,
-    data: requests.data[url],
-    refetch,
-  }
+  return { refetch, isPending, data, error }
 }
 
 export {

@@ -49,4 +49,21 @@ export function useRequestFetcher(url, requests, setRequests, httpClient) {
       })
     })
   }, [url, requests.states[url]])
+
+  function refetch() {
+    setRequests({
+      data: requests.data,
+      states: {
+        ...requests.states,
+        [url]: {...requests.states[url], refetch: true},
+      },
+    })
+  }
+
+  return {
+    error: requests.states[url] ? requests.states[url].error : null,
+    isPending: requests.states[url] ? requests.states[url].pending : true,
+    data: requests.data[url],
+    refetch,
+  }
 }
