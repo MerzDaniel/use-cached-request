@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`tests should fetch data 1`] = `
+<div
+  hook={
+    Object {
+      "data": "bar",
+      "error": undefined,
+      "isPending": false,
+      "refetch": [Function],
+    }
+  }
+>
+  bar
+</div>
+`;
+
+exports[`tests should show pending state 1`] = `
+<div
+  hook={
+    Object {
+      "data": undefined,
+      "error": undefined,
+      "isPending": true,
+      "refetch": [Function],
+    }
+  }
+>
+  true
+</div>
+`;

@@ -7,9 +7,12 @@ import './utils/ignore-comp-update-outside-act-warning'
 import {useRequest} from '../src/use-request'
 
 function TestComp() {
-  const {data, isPending, error} = useRequest('/some/cool/api/123')
+  const hook = useRequest('/some/cool/api/123')
+  const {data, isPending, error} = hook
   const res = `${isPending || data || error}`
-  return res
+  return <div hook={hook}>
+    {res}
+  </div>
 }
 
 describe('tests', () => {
