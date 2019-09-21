@@ -6,6 +6,7 @@ import {create, act} from 'react-test-renderer'
 import './utils/ignore-comp-update-outside-act-warning'
 import {useRequest} from '../src/use-request'
 import {RequestProvider, useCachedRequest} from "../src/use-cached-request";
+import {waitForIO} from "./utils/wait-for-io";
 
 function TestCompWithHook({hook}) {
   const request = hook('/some/cool/api/123')
@@ -28,11 +29,6 @@ function getRequest(comp) {
   return comp.root.findByType('div').props['data-request']
 }
 
-const waitForIO = async () => {
-  return new Promise((res) => {
-    setImmediate(() => setTimeout(res, 2))
-  })
-}
 
 for (let h of ['useRequest','useCachedRequest']) {
   describe(`Test for ${h}`, () => {
