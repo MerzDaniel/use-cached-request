@@ -11,11 +11,11 @@ const useRequest = (url) => {
   })
 
   React.useEffect(() => {
-    // already pending or loaded
     if (
       pendingCache[url]
       || (requests.data[url] && !(requests.states[url] && requests.states[url].refetch))
     ) {
+      // already pending or loaded
       return
     }
 
