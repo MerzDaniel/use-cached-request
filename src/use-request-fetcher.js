@@ -2,8 +2,10 @@ import React from "react";
 
 const pendingCache = {}
 
-export function useRequestFetcher(url, requests, setRequests, httpClient) {
+export function useRequestFetcher(url, requests = {states:{[url]: {}}, data: {}}, setRequests, httpClient) {
+
   React.useEffect(() => {
+    if (!requests || !setRequests) return
     if (
       pendingCache[url]
       || (requests.data[url] && !(requests.states[url] && requests.states[url].refetch))
@@ -61,7 +63,7 @@ export function useRequestFetcher(url, requests, setRequests, httpClient) {
   }
 
   return {
-    error: requests.states[url] ? requests.states[url].error : null,
+    error: requests.states[url] ? requests.states[url].error : undefined,
     isPending: requests.states[url] ? requests.states[url].pending : true,
     data: requests.data[url],
     refetch,
