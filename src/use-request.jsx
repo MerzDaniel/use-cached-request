@@ -1,8 +1,8 @@
 import React from 'react'
 import axios from 'axios'
+import {useRequestFetcher} from "./use-request-fetcher";
 
 const httpClient = axios
-const pendingCache = {}
 
 const useRequest = (url) => {
   const [requests, setRequestStates] = React.useState({
@@ -10,52 +10,7 @@ const useRequest = (url) => {
     data: {},
   })
 
-  React.useEffect(() => {
-    if (
-      pendingCache[url]
-      || (requests.data[url] && !(requests.states[url] && requests.states[url].refetch))
-    ) {
-      // already pending or loaded
-      return
-    }
-
-    pendingCache[url] = true
-    setRequestStates({
-      data: requests.data,
-      states: {
-        ...requests.states,
-        [url]: {
-          pending: true,
-          refetch: false,
-        },
-      },
-    })
-
-    httpClient.get(url).then(
-      ({data: responseData}) => {
-        pendingCache[url] = false
-        setRequestStates({
-          data: {
-            ...requests.data,
-            [url]: responseData,
-          },
-          states: {
-            ...requests.states,
-            [url]: {pending: false},
-          },
-        })
-      },
-    ).catch((e) => {
-      pendingCache[url] = false
-      setRequestStates({
-        data: {...requests.data},
-        states: {
-          ...requests.states,
-          [url]: {pending: false, error: e},
-        },
-      })
-    })
-  }, [url, requests.states[url]])
+  useRequestFetcher(url, requests, setRequestStates, httpClient)
 
   function refetch() {
     setRequestStates({
