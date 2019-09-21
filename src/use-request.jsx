@@ -1,8 +1,9 @@
-
 import React from 'react'
 import axios from 'axios'
 
 const httpClient = axios
+
+const pendingCache = {}
 
 const useRequest = (url) => {
   const [requests, setRequestStates] = React.useState({
@@ -13,12 +14,13 @@ const useRequest = (url) => {
   React.useEffect(() => {
     // already pending or loaded
     if (
-      requests.states[url].pending
+      pendingCache[url]
       || (requests.data[url] && !(requests.states[url] && requests.states[url].refetch))
     ) {
       return
     }
 
+    pendingCache[url] = true
     setRequestStates({
       data: requests.data,
       states: {
@@ -31,8 +33,8 @@ const useRequest = (url) => {
     })
 
     httpClient.get(url).then(
-      ({ data: responseData }) => {
-
+      ({data: responseData}) => {
+        pendingCache[url] = false
         setRequestStates({
           data: {
             ...requests.data,
@@ -40,16 +42,17 @@ const useRequest = (url) => {
           },
           states: {
             ...requests.states,
-            [url]: { pending: false },
+            [url]: {pending: false},
           },
         })
       },
     ).catch((e) => {
+      pendingCache[url] = false
       setRequestStates({
-        data: { ...requests.data },
+        data: {...requests.data},
         states: {
           ...requests.states,
-          [url]: { pending: false, error: e },
+          [url]: {pending: false, error: e},
         },
       })
     })
@@ -60,13 +63,14 @@ const useRequest = (url) => {
       data: requests.data,
       states: {
         ...requests.states,
-        [url]: { ...requests.states[url], refetch: true },
+        [url]: {...requests.states[url], refetch: true},
       },
     })
   }
 
   return {
-    ...(requests.states[url] || { pending: true }),
+    error: requests.states[url] ? requests.states[url].error : null,
+    isPending: requests.states[url] ? requests.states[url].pending : true,
     data: requests.data[url],
     refetch,
   }
