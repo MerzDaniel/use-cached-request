@@ -30,7 +30,7 @@ function getRequest(comp) {
 
 const waitForIO = async () => {
   return new Promise((res) => {
-    setImmediate(() => setTimeout(res, 1))
+    setImmediate(() => setTimeout(res, 2))
   })
 }
 
@@ -79,6 +79,15 @@ for (let h of ['useRequest','useCachedRequest']) {
       await waitForIO()
       expect(getRequest(comp).data).toBe('foo-bar')
       expect(stub.callCount).toBe(2)
+    })
+    it('should show error', async () => {
+      sandbox.stub(axios, 'get').rejects()
+      let comp
+      act(() => {
+        comp = create(<_TestCompUT/>)
+      })
+      await waitForIO()
+      expect(comp.toJSON()).toMatchSnapshot()
     })
   })
 }
