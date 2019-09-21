@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Caching should fetch data only once 1`] = `
+Array [
+  <div
+    data-request={
+      Object {
+        "data": "foo-bar-baz",
+        "error": undefined,
+        "isPending": false,
+        "refetch": [Function],
+      }
+    }
+  >
+    foo-bar-baz
+  </div>,
+  <div
+    data-request={
+      Object {
+        "data": "foo-bar-baz",
+        "error": undefined,
+        "isPending": false,
+        "refetch": [Function],
+      }
+    }
+  >
+    foo-bar-baz
+  </div>,
+]
+`;
