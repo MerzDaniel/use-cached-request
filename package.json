@@ -2,8 +2,9 @@
   "name": "use-cached-request",
   "version": "0.1.0",
   "description": "A react hook for fetching data. The fetched data is cached.",
-  "main": "index.jsx",
+  "main": "lib/index.js",
   "scripts": {
+    "build": "babel -d lib src",
     "test": "npx jest ./test/*",
     "test:watch": "npm run test -- --watch"
   },
